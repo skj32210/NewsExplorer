@@ -28,6 +28,9 @@ interface ArticleDao {
     @Query("SELECT * FROM articles WHERE id = :id")
     suspend fun getArticleById(id: String): Article?
 
+    @Query("SELECT * FROM articles WHERE id = :id")
+    fun getArticleFlowById(id: String): Flow<Article?> // Returns a Flow
+
     @Query("DELETE FROM articles WHERE isBookmarked = 0")
     suspend fun deleteNonBookmarkedArticles()
 }

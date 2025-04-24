@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.newsexplorer.data.model.Article
 import com.example.newsexplorer.viewmodel.ArticleDetailViewModel
+import com.example.newsexplorer.util.rememberHtmlAnnotatedString
 import java.text.SimpleDateFormat
 import java.util.Locale
 

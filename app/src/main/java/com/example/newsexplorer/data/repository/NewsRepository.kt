@@ -19,6 +19,7 @@ import java.time.format.DateTimeParseException
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+
 // Removed unused UUID import
 // import java.util.UUID
 
@@ -42,8 +43,16 @@ class NewsRepository(
     fun getAllArticles(): Flow<List<Article>> = articleDao.getAllArticles()
     fun getArticlesByCategory(category: String): Flow<List<Article>> = articleDao.getArticlesByCategory(category)
     fun getBookmarkedArticles(): Flow<List<Article>> = articleDao.getBookmarkedArticles()
-    suspend fun getArticleById(articleId: String): Article? = articleDao.getArticleById(articleId) // ID is now URL
+    suspend fun getArticleById(articleId: String): Article? { // articleId is URL
+        Log.d("NewsRepository", "Getting article by ID '$articleId' from DAO (single)")
+        return articleDao.getArticleById(articleId)
+    }
 
+    // *** ADD THIS FUNCTION ***
+    fun getArticleFlowById(articleId: String): Flow<Article?> { // articleId is URL
+        Log.d("NewsRepository", "Getting article FLOW by ID '$articleId' from DAO")
+        return articleDao.getArticleFlowById(articleId) // Call the new DAO method
+    }
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun refreshNewsForCategory(category: String, country: String = "us"): Result<Unit> {
         return updateLocalNews(category) { // Use helper function

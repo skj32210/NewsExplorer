@@ -28,18 +28,17 @@ import java.util.Locale
 fun ArticleCard(
     article: Article,
     onArticleClick: (Article) -> Unit,
-    modifier: Modifier = Modifier,
-    onToggleBookmark: () -> Unit
+    onToggleBookmark: () -> Unit, // This is passed in from the screen
+    modifier: Modifier = Modifier // Optional modifier parameter added
 ) {
     Card(
-        modifier = modifier
+        modifier = modifier // Apply modifier here
             .fillMaxWidth()
             .clickable { onArticleClick(article) },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = MaterialTheme.shapes.medium
     ) {
         Column {
-            // Article image
             article.urlToImage?.let { imageUrl ->
                 AsyncImage(
                     model = imageUrl,
@@ -52,7 +51,6 @@ fun ArticleCard(
             }
 
             Column(modifier = Modifier.padding(16.dp)) {
-                // Source and date
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
@@ -101,11 +99,11 @@ fun ArticleCard(
                 ) {
                     BookmarkButton(
                         isBookmarked = article.isBookmarked,
-                        onToggleBookmark = {}  // Will be implemented later
+                        // **** CORRECTION ****
+                        // Pass the lambda received by ArticleCard down to BookmarkButton
+                        onToggleBookmark = onToggleBookmark
                     )
-
                     Spacer(modifier = Modifier.width(16.dp))
-
                     Text(
                         text = article.category.uppercase(),
                         style = MaterialTheme.typography.labelMedium,

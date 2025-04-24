@@ -8,13 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bookmark
-import androidx.compose.material.icons.filled.Business
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocalMovies
-import androidx.compose.material.icons.filled.Science
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.SportsBasketball
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -63,6 +57,15 @@ fun NavigationDrawerContent(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
         )
 
+        HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+
+        DrawerItem(
+            icon = Icons.Default.Public,
+            label = "General",
+            isSelected = selectedCategory == "general",
+            onClick = { onCategorySelected("general") }
+        )
+
         DrawerItem(
             icon = Icons.Default.Business,
             label = "Business",
@@ -71,16 +74,9 @@ fun NavigationDrawerContent(
         )
 
         DrawerItem(
-            icon = Icons.Default.LocalMovies,
-            label = "Entertainment",
-            isSelected = selectedCategory == "entertainment",
-            onClick = { onCategorySelected("entertainment") }
-        )
-
-        DrawerItem(
-            icon = Icons.Default.Science,
-            label = "Science & Technology",
-            isSelected = selectedCategory == "science" || selectedCategory == "technology",
+            icon = Icons.Default.Memory,
+            label = "Technology",
+            isSelected = selectedCategory == "technology",
             onClick = { onCategorySelected("technology") }
         )
 
@@ -89,6 +85,27 @@ fun NavigationDrawerContent(
             label = "Sports",
             isSelected = selectedCategory == "sports",
             onClick = { onCategorySelected("sports") }
+        )
+
+        DrawerItem(
+            icon = Icons.Default.Movie,
+            label = "Entertainment",
+            isSelected = selectedCategory == "entertainment",
+            onClick = { onCategorySelected("entertainment") }
+        )
+
+        DrawerItem(
+            icon = Icons.Default.Science,
+            label = "Science",
+            isSelected = selectedCategory == "science",
+            onClick = { onCategorySelected("science") }
+        )
+
+        DrawerItem(
+            icon = Icons.Default.HealthAndSafety,
+            label = "Health",
+            isSelected = selectedCategory == "health",
+            onClick = { onCategorySelected("health") }
         )
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
