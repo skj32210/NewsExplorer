@@ -1,5 +1,6 @@
 package com.example.newsexplorer
 
+// REMOVED dependency creation imports (Room, Retrofit, ApiService, Database, Repository)
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,55 +14,30 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.room.Room
-import com.example.newsexplorer.data.api.NewsApiService
-import com.example.newsexplorer.data.database.NewsDatabase
 import com.example.newsexplorer.data.preferences.UserPreferencesManager
-import com.example.newsexplorer.data.repository.NewsRepository
 import com.example.newsexplorer.ui.navigation.NewsNavigation
 import com.example.newsexplorer.ui.theme.FontSize
 import com.example.newsexplorer.ui.theme.NewsExplorerTheme
 import com.example.newsexplorer.viewmodel.SettingsViewModel
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : ComponentActivity() {
 
-    // --- Instantiate Dependencies ---
-    private val newsDatabase: NewsDatabase by lazy {
-        Room.databaseBuilder(
-            applicationContext,
-            NewsDatabase::class.java, "news-database"
-        )
-            .fallbackToDestructiveMigration()
-            .build()
-    }
-
-    private val newsApiService: NewsApiService by lazy {
-        Retrofit.Builder()
-            .baseUrl("https://newsapi.org/") // Base URL for NewsAPI
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(NewsApiService::class.java)
-    }
-
-    private val newsRepository: NewsRepository by lazy { // Explicit type
-        NewsRepository(newsApiService, newsDatabase.articleDao())
-    }
-
-    private val userPreferencesManager: UserPreferencesManager by lazy {
-        UserPreferencesManager(applicationContext)
-    }
-    // --- End Dependency Instantiation ---
-
+    // REMOVED lazy initializers for database, apiService, repository, prefsManager
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // --- Get dependencies from Application context ---
+        // Ensure NewsExplorerApplication is registered in Manifest
+        val app = applicationContext as NewsExplorerApplication
+        val newsRepository = app.newsRepository
+        val userPreferencesManager = app.userPreferencesManager
+        // --- End Dependency Retrieval ---
+
         setContent {
-            // Settings VM is used for theme/font, created here
+            // Settings VM factory uses the retrieved prefs manager
             val settingsViewModel: SettingsViewModel = viewModel(
                 factory = SettingsViewModelFactory(userPreferencesManager)
             )
@@ -85,7 +61,7 @@ class MainActivity : ComponentActivity() {
 
             NewsExplorerTheme(darkTheme = useDarkTheme, fontSize = appFontSize) {
                 Surface {
-                    // Pass BOTH repository and prefs manager needed by factories within Nav graph
+                    // Pass the retrieved dependencies to the Nav graph
                     NewsNavigation(
                         repository = newsRepository,
                         userPreferencesManager = userPreferencesManager
