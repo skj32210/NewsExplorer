@@ -1,56 +1,79 @@
 package com.example.newsexplorer.ui.screens
 
-import android.content.Context // Added import
+// Removed BookmarkButton import - logic moved to TopAppBar actions
+// import com.example.newsexplorer.ui.components.BookmarkButton
+// **** CORRECT ViewModel Import ****
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build // Added import
-import androidx.annotation.RequiresApi // Added import
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.* // Use wildcard
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material.icons.Icons
-import android.util.Log
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.material.icons.automirrored.filled.ArrowBack // Correct import
-import androidx.compose.material.icons.filled.Bookmark // Import Bookmark
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.outlined.BookmarkBorder // Import Outlined Bookmark
-import androidx.compose.material3.* // Use wildcard
-import androidx.compose.runtime.* // Use wildcard
+import androidx.compose.material.icons.outlined.BookmarkBorder
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextOverflow // Import TextOverflow
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.newsexplorer.data.model.Article // Import Article model
-import com.example.newsexplorer.ui.components.BookmarkButton // Import BookmarkButton if used (or remove action)
-import com.example.newsexplorer.viewmodel.ArticleDetailViewModel // CORRECT ViewModel Import
+import com.example.newsexplorer.data.model.Article
+import com.example.newsexplorer.viewmodel.ArticleDetailViewModel
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O) // Add if repo methods called require it
+// Add RequiresApi back if loadArticle/toggleBookmark -> repo methods need it
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ArticleDetailScreen(
-    viewModel: ArticleDetailViewModel, // CORRECT ViewModel type
+    // **** CORRECT ViewModel PARAMETER TYPE ****
+    viewModel: ArticleDetailViewModel,
     articleId: String,
     onBackClick: () -> Unit
 ){
     // Observe state from the CORRECT ViewModel instance
-    val articleState by viewModel.article.collectAsState() // Rename variable for clarity
+    val articleState by viewModel.article.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState() // Observe error state
+    val error by viewModel.error.collectAsState()
     val context = LocalContext.current
-    val snackbarHostState = remember { SnackbarHostState() } // For errors
+    val snackbarHostState = remember { SnackbarHostState() }
 
     // Load article when articleId changes
     LaunchedEffect(articleId) {
-        viewModel.loadArticle(articleId)
+        viewModel.loadArticle(articleId) // Call function on correct ViewModel
     }
 
     // Show errors
@@ -59,13 +82,12 @@ fun ArticleDetailScreen(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }, // Add host
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
-                    // Show source name if article is loaded
                     Text(
-                        articleState?.sourceName ?: "Article", // Use articleState
+                        articleState?.sourceName ?: "Article",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -76,14 +98,14 @@ fun ArticleDetailScreen(
                     }
                 },
                 actions = {
-                    // Share Action Button
-                    val currentArticle = articleState // Capture current state for lambda
+                    val currentArticle = articleState // Capture state for lambdas
                     if (currentArticle != null) {
+                        // Share Action
                         IconButton(onClick = { shareArticle(context, currentArticle) }) {
                             Icon(Icons.Filled.Share, contentDescription = "Share Article")
                         }
                         // Bookmark Action
-                        IconButton(onClick = { viewModel.toggleBookmark(currentArticle.id) }) {
+                        IconButton(onClick = { viewModel.toggleBookmark(currentArticle.id) }) { // Call correct VM method
                             Icon(
                                 imageVector = if (currentArticle.isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
                                 contentDescription = "Toggle Bookmark",
@@ -93,8 +115,7 @@ fun ArticleDetailScreen(
                     }
                 }
             )
-        },
-        // Removed FAB - actions moved to TopAppBar
+        }
     ) { paddingValues ->
         when {
             isLoading -> {
@@ -102,18 +123,15 @@ fun ArticleDetailScreen(
                     CircularProgressIndicator()
                 }
             }
-            // Use the specific article state from the ViewModel
             articleState != null -> {
-                // Use non-nullable 'article' inside this block for convenience
-                val article = articleState!!
+                val article = articleState!! // Use non-nullable article inside this block
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues) // Apply outer padding
+                        .padding(paddingValues)
                         .verticalScroll(rememberScrollState())
-                        .padding(bottom = 16.dp) // Add padding below content
+                        .padding(bottom = 16.dp)
                 ) {
-                    // Article image
                     article.urlToImage?.let { imageUrl ->
                         AsyncImage(
                             model = imageUrl,
@@ -123,37 +141,27 @@ fun ArticleDetailScreen(
                                 .fillMaxWidth()
                                 .heightIn(max = 300.dp) // Limit image height
                         )
-                    } ?: Spacer(modifier = Modifier.height(16.dp)) // Space if no image
+                    } ?: Spacer(modifier = Modifier.height(16.dp))
 
-                    // Content Padding
                     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        // ... Text elements using non-nullable 'article' ...
                         Spacer(modifier = Modifier.height(16.dp))
-
-                        // Source and date
-                        Text(
-                            text = article.sourceName, // Use non-nullable article
+                        Text(text = article.sourceName,
                             style = MaterialTheme.typography.titleSmall, // Use smaller title for source
                             color = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = SimpleDateFormat("MMMM dd, yyyy HH:mm", Locale.getDefault())
-                                .format(article.publishedAt), // Use non-nullable article
+                        Text(text = SimpleDateFormat("MMMM dd, yyyy HH:mm", Locale.getDefault()).format(article.publishedAt),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-
-                        // Title
-                        Text(
-                            text = article.title, // Use non-nullable article
+                        Text(text = article.title, // Use non-nullable article
                             style = MaterialTheme.typography.headlineSmall
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-
-                        // Author
                         article.author?.let { author ->
-                            Text(
+                        Text(
                                 text = "By $author",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -190,7 +198,7 @@ fun ArticleDetailScreen(
                     } // End Content Padding Column
                 } // End Main Scrollable Column
             }
-            else -> { // Article is null and not loading (e.g., not found or error)
+            else -> { // Article is null and not loading
                 Box(Modifier.fillMaxSize().padding(paddingValues), contentAlignment = Alignment.Center) {
                     Text(
                         text = if (error != null) "Error loading article." else "Article not found.",
