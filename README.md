@@ -48,8 +48,8 @@ Follow these steps to get the project running:
 **2. Clone the Repository:**
 
 bash
-git clone https://github.com/skj32210/NewsExplorer.git # Replace with your repo URL
-cd NewsExplorer
+   git clone https://github.com/skj32210/NewsExplorer.git
+   cd NewsExplorer
 
 **3. Get Your NewsAPI Key:**
 * This project uses the NewsAPI to fetch news articles. You need a free API key.
