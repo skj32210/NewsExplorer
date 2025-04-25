@@ -48,7 +48,7 @@ Follow these steps to get the project running:
 **2. Clone the Repository:**
 
 bash
-git clone https://github.com/YOUR_USERNAME/NewsExplorer.git # Replace with your repo URL
+git clone https://github.com/skj32210/NewsExplorer.git # Replace with your repo URL
 cd NewsExplorer
 
 **3. Get Your NewsAPI Key:**
