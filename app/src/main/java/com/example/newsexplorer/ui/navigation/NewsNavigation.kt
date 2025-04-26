@@ -1,7 +1,5 @@
-// **** CORRECTED PACKAGE NAME ****
 package com.example.newsexplorer.ui.navigation
 
-// **** Import necessary classes for URL encoding ****
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
@@ -36,19 +34,17 @@ import java.nio.charset.StandardCharsets
 object NavDestinations {
     const val HOME = "home"
     const val CATEGORY = "category"
-    const val ARTICLE_DETAIL = "article_detail" // The argument name is defined here implicitly
+    const val ARTICLE_DETAIL = "article_detail"
     const val SAVED = "saved"
     const val SETTINGS = "settings"
     const val SEARCH = "search"
 }
 
-// @RequiresApi is likely needed IF ViewModels call repo methods needing it AND minSdk < O
-// Let's keep it for now as repo/VMs use O features
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NewsNavigation(
-    repository: NewsRepository, // Accept repository instance
-    userPreferencesManager: UserPreferencesManager, // Accept prefs manager instance
+    repository: NewsRepository,
+    userPreferencesManager: UserPreferencesManager,
     navController: NavHostController = rememberNavController(),
     startDestination: String = NavDestinations.HOME
 ) {
@@ -61,10 +57,8 @@ fun NewsNavigation(
             NewsHomeScreen(
                 viewModel = newsViewModel,
                 onArticleClick = { article ->
-                    // --- Encode the URL (which is article.id) ---
                     val encodedUrl = URLEncoder.encode(article.id, StandardCharsets.UTF_8.toString())
                     navController.navigate("${NavDestinations.ARTICLE_DETAIL}/$encodedUrl")
-                    // -----------------------------------------
                 },
                 onCategoryClick = { category -> navController.navigate("${NavDestinations.CATEGORY}/$category") },
                 onSearchClick = { navController.navigate(NavDestinations.SEARCH) },
@@ -83,10 +77,8 @@ fun NewsNavigation(
                 viewModel = newsViewModel,
                 categoryId = categoryId,
                 onArticleClick = { article ->
-                    // --- Encode the URL ---
                     val encodedUrl = URLEncoder.encode(article.id, StandardCharsets.UTF_8.toString())
                     navController.navigate("${NavDestinations.ARTICLE_DETAIL}/$encodedUrl")
-                    // ---------------------
                 },
                 onBackClick = { navController.popBackStack() },
                 onSearchClick = { navController.navigate(NavDestinations.SEARCH) }
@@ -94,19 +86,14 @@ fun NewsNavigation(
         }
 
         composable(
-            // The argument name in the route definition MUST match the key used to retrieve it
-            route = "${NavDestinations.ARTICLE_DETAIL}/{articleUrl}", // Use a descriptive name like articleUrl
-            arguments = listOf(navArgument("articleUrl") { type = NavType.StringType }) // Match argument name
+            route = "${NavDestinations.ARTICLE_DETAIL}/{articleUrl}",
+            arguments = listOf(navArgument("articleUrl") { type = NavType.StringType })
         ) { backStackEntry ->
-            // Retrieve the encoded URL using the correct argument name
             val encodedArticleUrl = backStackEntry.arguments?.getString("articleUrl") ?: ""
-            // Decoding is generally NOT needed here if the ViewModel uses the encoded URL as the ID
-            // val articleUrl = URLDecoder.decode(encodedArticleUrl, StandardCharsets.UTF_8.toString())
 
             val detailViewModel: ArticleDetailViewModel = viewModel(factory = ArticleDetailViewModelFactory(repository))
             ArticleDetailScreen(
                 viewModel = detailViewModel,
-                // Pass the encoded URL (which is the ID) to the screen/ViewModel
                 articleId = encodedArticleUrl,
                 onBackClick = { navController.popBackStack() }
             )
@@ -117,10 +104,8 @@ fun NewsNavigation(
             SavedArticlesScreen(
                 viewModel = savedViewModel,
                 onArticleClick = { article ->
-                    // --- Encode the URL ---
                     val encodedUrl = URLEncoder.encode(article.id, StandardCharsets.UTF_8.toString())
                     navController.navigate("${NavDestinations.ARTICLE_DETAIL}/$encodedUrl")
-                    // ---------------------
                 },
                 onBackClick = { navController.popBackStack() }
             )
@@ -139,10 +124,8 @@ fun NewsNavigation(
             SearchResultsScreen(
                 viewModel = searchViewModel,
                 onArticleClick = { article ->
-                    // --- Encode the URL ---
                     val encodedUrl = URLEncoder.encode(article.id, StandardCharsets.UTF_8.toString())
                     navController.navigate("${NavDestinations.ARTICLE_DETAIL}/$encodedUrl")
-                    // ---------------------
                 },
                 onBackClick = { navController.popBackStack() }
             )

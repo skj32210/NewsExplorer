@@ -30,40 +30,32 @@ class ArticleDetailViewModel constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val article: StateFlow<Article?> = _articleId.filterNotNull().flatMapLatest { id ->
-        // *** CHANGE THIS PART ***
-        // Observe the Flow directly from the repository/DAO
         repository.getArticleFlowById(id)
             .onStart {
-                // You might want to set loading=true only if the initial value is null
-                // This avoids flashing the loading indicator on every minor update
                 Log.d("ArticleDetailVM", "Starting article flow observation for ID: $id")
-                _isLoading.value = true // Keep for initial load indication
+                _isLoading.value = true
             }
-            .onEach { // Use onEach to reset loading state after first emission
+            .onEach {
                 _isLoading.value = false
             }
             .catch { e ->
                 Log.e("ArticleDetailVM", "Error in article flow for ID: $id", e)
                 _error.value = "Error loading article: ${e.localizedMessage}"
-                emit(null) // Emit null in case of an error in the flow itself
+                emit(null)
             }
-        // *** END OF CHANGE ***
     }.stateIn(
         scope = viewModelScope,
-        // Use WhileSubscribed to keep observing while UI is visible
         started = SharingStarted.WhileSubscribed(5000L),
-        initialValue = null // Start with null initially
+        initialValue = null
     )
 
 
     fun loadArticle(articleId: String) {
         Log.d("ArticleDetailVM", "Loading article with ID: $articleId")
         if (_articleId.value != articleId) {
-            _articleId.value = articleId // Trigger the flatMapLatest to switch observation
+            _articleId.value = articleId
             _error.value = null
         } else {
-            // If ID is the same, manually clear loading if needed, although
-            // onStart/onEach in the flow should handle it.
             _isLoading.value = false
         }
     }
@@ -72,7 +64,6 @@ class ArticleDetailViewModel constructor(
         viewModelScope.launch {
             Log.d("ArticleDetailVM", "Toggling bookmark for ID: $articleId")
             repository.toggleBookmark(articleId)
-            // No need to manually refresh `article` flow - Room's Flow triggers automatically
         }
     }
 }

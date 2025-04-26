@@ -1,7 +1,5 @@
 package com.example.newsexplorer.ui.screens
 
-// Import WindowSizeClass - check your libs.versions.toml for the correct alias
-// Assuming 'androidx-material3-window-size' is the alias for 'androidx.compose.material3:material3-window-size-class'
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,9 +45,8 @@ import com.example.newsexplorer.ui.components.SharedNewsHeader
 import com.example.newsexplorer.viewmodel.NewsViewModel
 import kotlinx.coroutines.launch
 
-// Add RequiresApi because refreshDataForCategory calls repo methods that require it
 @SuppressLint("ContextCastToActivity")
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class) // Add OptIn for calculateWindowSizeClass
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Composable
 fun NewsHomeScreen(
     viewModel: NewsViewModel,
@@ -58,16 +55,14 @@ fun NewsHomeScreen(
     onSearchClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onSavedArticlesClick: () -> Unit,
-    // Provide factory if not using Hilt
-    //viewModel: NewsViewModel = viewModel(/* factory = YourViewModelFactory */)
 ) {
     val articles by viewModel.articles.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState() // Collect error state
+    val error by viewModel.error.collectAsState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() } // Add Snackbar host state
+    val snackbarHostState = remember { SnackbarHostState() }
 
 
     // Calculate window size class
@@ -77,7 +72,7 @@ fun NewsHomeScreen(
     // Define default categories (Could be fetched from Prefs or constant)
     val categories = remember {
         listOf(
-            Category("general", "General", 0), // IconRes is placeholder
+            Category("general", "General", 0),
             Category("business", "Business", 0),
             Category("technology", "Technology", 0),
             Category("sports", "Sports", 0),
@@ -87,17 +82,13 @@ fun NewsHomeScreen(
         )
     }
 
-    // Show error message in Snackbar
     LaunchedEffect(error) {
         error?.let {
             snackbarHostState.showSnackbar("Error: $it")
-            // Optionally clear the error in ViewModel after showing
         }
     }
 
-    // Trigger data refresh when selectedCategory changes
     LaunchedEffect(selectedCategory) {
-        // Corrected: Call the appropriate ViewModel function
         viewModel.refreshDataForCategory(selectedCategory)
     }
 
@@ -148,11 +139,11 @@ fun NewsHomeScreen(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                 )
 
-                if (isLoading && articles.isEmpty()) { // Show only if loading initial data
+                if (isLoading && articles.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
                     }
-                } else if (articles.isEmpty()) { // Handle empty state (could be error or no data)
+                } else if (articles.isEmpty()) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
                             text = if (error != null) "Could not load articles." else "No articles found.",
@@ -162,7 +153,6 @@ fun NewsHomeScreen(
                         )
                     }
                 } else {
-                    // Determine grid columns based on window size
                     val columns = when (widthSizeClass) {
                         WindowWidthSizeClass.Compact -> 1
                         WindowWidthSizeClass.Medium -> 2
@@ -170,11 +160,10 @@ fun NewsHomeScreen(
                     }
 
                     if (columns == 1) {
-                        // Use LazyColumn for single column
                         LazyColumn(
                             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                             modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(16.dp) // Add spacing
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             items(articles, key = { it.id }) { article ->
                                 ArticleCard(
@@ -185,7 +174,6 @@ fun NewsHomeScreen(
                             }
                         }
                     } else {
-                        // Use LazyVerticalGrid for multiple columns
                         LazyVerticalGrid(
                             columns = GridCells.Fixed(columns),
                             contentPadding = PaddingValues(16.dp),
@@ -198,7 +186,6 @@ fun NewsHomeScreen(
                                     article = article,
                                     onArticleClick = onArticleClick,
                                     onToggleBookmark = { viewModel.toggleBookmark(article.id) }
-                                    // No extra padding modifier needed here due to grid arrangement spacing
                                 )
                             }
                         }

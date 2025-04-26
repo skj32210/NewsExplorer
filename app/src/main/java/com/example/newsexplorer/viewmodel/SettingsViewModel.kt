@@ -1,23 +1,20 @@
 package com.example.newsexplorer.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newsexplorer.data.preferences.UserPreferencesManager
-// Removed dagger/inject imports
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-// import javax.inject.Inject // Removed
 
-// Removed Hilt/Dagger annotations
-class SettingsViewModel /* @Inject */ constructor(
+class SettingsViewModel
+constructor(
     private val preferencesManager: UserPreferencesManager
-    // You might need to inject NewsRepository here if you add the clearCache function
-    // private val repository: NewsRepository
+
 ) : ViewModel() {
 
-    // ... (rest of the ViewModel remains the same) ...
 
     val themeMode: StateFlow<Int> = preferencesManager.themeMode
         .stateIn(viewModelScope, SharingStarted.Eagerly, 0)
@@ -64,13 +61,9 @@ class SettingsViewModel /* @Inject */ constructor(
         }
     }
 
-    // Example: Function to clear cache (requires NewsRepository)
-    /*
     fun clearCache() {
         viewModelScope.launch {
-            // repository.clearNonBookmarkedArticles() // Uncomment if repository is injected
             Log.d("SettingsViewModel", "Clear cache action triggered (implementation needed)")
         }
     }
-    */
 }

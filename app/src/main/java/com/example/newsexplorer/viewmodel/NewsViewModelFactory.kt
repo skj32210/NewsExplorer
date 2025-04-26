@@ -1,4 +1,4 @@
-package com.example.newsexplorer.viewmodel // Or your DI package
+package com.example.newsexplorer.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

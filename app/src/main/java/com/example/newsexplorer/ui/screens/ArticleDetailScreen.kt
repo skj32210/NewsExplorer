@@ -1,8 +1,5 @@
 package com.example.newsexplorer.ui.screens
 
-// Removed BookmarkButton import if logic moved to TopAppBar
-// import com.example.newsexplorer.ui.components.BookmarkButton
-// **** CORRECT ViewModel Import ****
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -64,37 +61,31 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O) // Keep if repo methods called require it
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ArticleDetailScreen(
-    // **** CORRECT ViewModel PARAMETER TYPE ****
     viewModel: ArticleDetailViewModel,
     articleId: String,
     onBackClick: () -> Unit
 ){
-    // Observe state from the CORRECT ViewModel instance
     val articleState by viewModel.article.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // --- State to control WebView visibility ---
     var showWebView by remember { mutableStateOf(false) }
-    val webViewUrl by remember { derivedStateOf { articleState?.url } } // Track URL efficiently
+    val webViewUrl by remember { derivedStateOf { articleState?.url } }
 
-    // --- Load article when articleId changes ---
     LaunchedEffect(articleId) {
-        showWebView = false // Hide WebView when navigating to a new article
-        viewModel.loadArticle(articleId) // Call function on correct ViewModel
+        showWebView = false
+        viewModel.loadArticle(articleId)
     }
 
-    // --- Handle system back press when WebView is shown ---
     BackHandler(enabled = showWebView) {
-        showWebView = false // Close WebView on back press
+        showWebView = false
     }
 
-    // Show errors
     LaunchedEffect(error) {
         error?.let { snackbarHostState.showSnackbar("Error: $it") }
     }
@@ -111,7 +102,6 @@ fun ArticleDetailScreen(
                     )
                 },
                 navigationIcon = {
-                    // Handle back press differently if WebView is showing
                     IconButton(onClick = {
                         if (showWebView) {
                             showWebView = false
@@ -133,11 +123,10 @@ fun ArticleDetailScreen(
                         IconButton(
                             onClick = {
                                 Log.d("ArticleDetailScreen", "Share IconButton onClick triggered.")
-                                // Toast.makeText(context, "Share Clicked!", Toast.LENGTH_SHORT).show() // Remove this
                                 if (currentArticle != null) {
-                                    shareArticle(context, currentArticle) // UNCOMMENT THIS
+                                    shareArticle(context, currentArticle)
                                 } else {
-                                    Log.w("ArticleDetailScreen", "Share clicked but article was null!") // Keep this log just in case
+                                    Log.w("ArticleDetailScreen", "Share clicked but article was null!")
                                 }
                             },
                             enabled = true
@@ -145,7 +134,7 @@ fun ArticleDetailScreen(
                         Icon(Icons.Filled.Share, contentDescription = "Share Article")
                     }
                         // Bookmark Action
-                        IconButton(onClick = { viewModel.toggleBookmark(currentArticle.id) }) { // Call correct VM method
+                        IconButton(onClick = { viewModel.toggleBookmark(currentArticle.id) }) {
                             Icon(
                                 imageVector = if (currentArticle.isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
                                 contentDescription = "Toggle Bookmark",
@@ -154,10 +143,8 @@ fun ArticleDetailScreen(
                         }
                     }
                 }
-                // Removed TopAppBarDefaults colors = ... (use default M3 colors)
             )
         }
-        // FloatingActionButton removed as Share is in AppBar now
     ) { paddingValues ->
         when {
             isLoading -> {
@@ -165,20 +152,16 @@ fun ArticleDetailScreen(
                     CircularProgressIndicator()
                 }
             }
-            // Use the specific article state from the ViewModel
             articleState != null -> {
-                val article = articleState!! // Use non-nullable 'article' inside this block
-                // Use Box to potentially overlay WebView or switch content
+                val article = articleState!!
                 Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
 
-                    // --- Article Details Column (Visible when WebView is hidden) ---
-                    // Use Modifier.alpha to hide/show instead of removing from composition
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
-                            .padding(bottom = 16.dp) // Padding at bottom
-                            .alpha(if (showWebView) 0f else 1f) // Hide if WebView is shown
+                            .padding(bottom = 16.dp)
+                            .alpha(if (showWebView) 0f else 1f)
                     ) {
                         article.urlToImage?.let { imageUrl ->
                             AsyncImage(
@@ -212,28 +195,24 @@ fun ArticleDetailScreen(
                             Text(text = displayContent, style = MaterialTheme.typography.bodyLarge)
                             Spacer(modifier = Modifier.height(24.dp))
 
-                            // --- "Read more" Link ---
-                            if (!article.url.isNullOrBlank()) { // Check if URL exists
+                            if (!article.url.isNullOrBlank()) {
                                 Text(
                                     text = "Read the full article at the source",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.clickable { showWebView = true } // Just show WebView
+                                    modifier = Modifier.clickable { showWebView = true }
                                 )
                             }
-                            // --- End Read more Link ---
 
-                        } // End Content Padding Column
-                    } // End Main Scrollable Column
+                        }
+                    }
 
-                    // --- WebView (Conditionally Displayed) ---
                     if (showWebView && !webViewUrl.isNullOrBlank()) {
                         AndroidView(
                             factory = { ctx ->
                                 WebView(ctx).apply {
                                     settings.javaScriptEnabled = true
                                     webViewClient = object : WebViewClient() {
-                                        // Optional: Add error handling or progress indication here
                                         override fun onPageFinished(view: WebView?, url: String?) {
                                             super.onPageFinished(view, url)
                                             Log.d("WebView", "Page finished loading: $url")
@@ -243,21 +222,19 @@ fun ArticleDetailScreen(
                             },
                             update = { webView ->
                                 webViewUrl?.let { url ->
-                                    // Load URL only if it's different from the current one
                                     if (webView.url != url) {
                                         webView.loadUrl(url)
                                         Log.d("WebView", "Loading URL: $url")
                                     }
                                 }
                             },
-                            modifier = Modifier.fillMaxSize() // Let WebView fill the Box
+                            modifier = Modifier.fillMaxSize()
                         )
                     }
-                    // --- End WebView ---
 
-                } // End Box
+                }
             }
-            else -> { // Article is null and not loading (e.g., not found or error)
+            else -> {
                 Box(Modifier.fillMaxSize().padding(paddingValues), contentAlignment = Alignment.Center) {
                     Text(
                         text = if (error != null) "Error loading article." else "Article not found.",
@@ -267,12 +244,11 @@ fun ArticleDetailScreen(
                     )
                 }
             }
-        } // End When
-    } // End Scaffold
+        }
+    }
 }
 
 
-// --- Helper Functions --- (Keep these)
 fun shareArticle(context: Context, article: Article?) {
     if (article == null) {
         Log.w("ShareHelper", "Attempted to share with null article.")
@@ -281,7 +257,7 @@ fun shareArticle(context: Context, article: Article?) {
     }
 
     val shareText = "Check out this article: ${article.title}\n${article.url}"
-    Log.d("ShareHelper", "Sharing text: $shareText") // Did you see this log?
+    Log.d("ShareHelper", "Sharing text: $shareText")
 
     val sendIntent = Intent().apply {
         action = Intent.ACTION_SEND
@@ -291,16 +267,14 @@ fun shareArticle(context: Context, article: Article?) {
     }
 
     val shareIntent = Intent.createChooser(sendIntent, "Share Article via")
-    Log.d("ShareHelper", "Created share intent chooser.") // Did you see this log?
+    Log.d("ShareHelper", "Created share intent chooser.")
 
     try {
-        Log.d("ShareHelper", "Attempting to start share activity...") // Did you see this log?
+        Log.d("ShareHelper", "Attempting to start share activity...")
         context.startActivity(shareIntent)
-        Log.d("ShareHelper", "Share activity started successfully.") // Did you see THIS log?
+        Log.d("ShareHelper", "Share activity started successfully.")
     } catch (e: Exception) {
-        // Did you see THIS log instead?
         Log.e("ShareHelper", "Failed to start share intent activity.", e)
         Toast.makeText(context, "Could not open share options. No app available?", Toast.LENGTH_LONG).show()
     }
 }
-fun openInBrowser(context: Context, url: String?) { /* ... */ }

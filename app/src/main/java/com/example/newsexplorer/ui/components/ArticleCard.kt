@@ -28,11 +28,11 @@ import java.util.Locale
 fun ArticleCard(
     article: Article,
     onArticleClick: (Article) -> Unit,
-    onToggleBookmark: () -> Unit, // This is passed in from the screen
-    modifier: Modifier = Modifier // Optional modifier parameter added
+    onToggleBookmark: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier // Apply modifier here
+        modifier = modifier
             .fillMaxWidth()
             .clickable { onArticleClick(article) },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -99,8 +99,6 @@ fun ArticleCard(
                 ) {
                     BookmarkButton(
                         isBookmarked = article.isBookmarked,
-                        // **** CORRECTION ****
-                        // Pass the lambda received by ArticleCard down to BookmarkButton
                         onToggleBookmark = onToggleBookmark
                     )
                     Spacer(modifier = Modifier.width(16.dp))

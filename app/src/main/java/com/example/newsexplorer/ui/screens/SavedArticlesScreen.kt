@@ -31,30 +31,25 @@ import com.example.newsexplorer.viewmodel.SavedArticlesViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SavedArticlesScreen(
-    viewModel: SavedArticlesViewModel, // CORRECT ViewModel parameter
+    viewModel: SavedArticlesViewModel,
     onArticleClick: (Article) -> Unit,
     onBackClick: () -> Unit
 ) {
-    // Collect state from the CORRECT ViewModel
     val savedArticles by viewModel.savedArticles.collectAsState()
-    // REMOVE unused state collections:
-    // val articles by viewModel.articles.collectAsState()
-    // val selectedCategory by viewModel.selectedCategory.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Saved Articles", style = MaterialTheme.typography.titleLarge) },
-                // Add navigation icon for consistency
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack, // Use AutoMirrored
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors() // Optional: Use default colors
+                colors = TopAppBarDefaults.topAppBarColors()
             )
         }
     ) { paddingValues ->
@@ -77,7 +72,7 @@ fun SavedArticlesScreen(
                     ArticleCard(
                         article = article,
                         onArticleClick = onArticleClick,
-                        onToggleBookmark = { viewModel.toggleBookmark(article.id) } // Correct ViewModel action
+                        onToggleBookmark = { viewModel.toggleBookmark(article.id) }
                     )
                 }
             }

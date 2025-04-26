@@ -1,10 +1,11 @@
 package com.example.newsexplorer
 
-// REMOVED dependency creation imports (Room, Retrofit, ApiService, Database, Repository)
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
@@ -22,22 +23,18 @@ import com.example.newsexplorer.viewmodel.SettingsViewModel
 
 class MainActivity : ComponentActivity() {
 
-    // REMOVED lazy initializers for database, apiService, repository, prefsManager
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // --- Get dependencies from Application context ---
-        // Ensure NewsExplorerApplication is registered in Manifest
         val app = applicationContext as NewsExplorerApplication
         val newsRepository = app.newsRepository
         val userPreferencesManager = app.userPreferencesManager
-        // --- End Dependency Retrieval ---
 
         setContent {
-            // Settings VM factory uses the retrieved prefs manager
             val settingsViewModel: SettingsViewModel = viewModel(
                 factory = SettingsViewModelFactory(userPreferencesManager)
             )
@@ -56,12 +53,10 @@ class MainActivity : ComponentActivity() {
                 else -> FontSize.Medium
             }
 
-            // windowSizeClass is calculated but not explicitly used below (ok for now)
             val windowSizeClass = calculateWindowSizeClass(this)
 
             NewsExplorerTheme(darkTheme = useDarkTheme, fontSize = appFontSize) {
                 Surface {
-                    // Pass the retrieved dependencies to the Nav graph
                     NewsNavigation(
                         repository = newsRepository,
                         userPreferencesManager = userPreferencesManager
@@ -72,7 +67,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// Settings Factory remains the same
 class SettingsViewModelFactory(private val prefsManager: UserPreferencesManager) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SettingsViewModel::class.java)) {

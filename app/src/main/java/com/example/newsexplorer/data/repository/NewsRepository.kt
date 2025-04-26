@@ -20,8 +20,6 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-// Removed unused UUID import
-// import java.util.UUID
 
 class NewsRepository(
     private val newsApiService: NewsApiService,
@@ -43,26 +41,25 @@ class NewsRepository(
     fun getAllArticles(): Flow<List<Article>> = articleDao.getAllArticles()
     fun getArticlesByCategory(category: String): Flow<List<Article>> = articleDao.getArticlesByCategory(category)
     fun getBookmarkedArticles(): Flow<List<Article>> = articleDao.getBookmarkedArticles()
-    suspend fun getArticleById(articleId: String): Article? { // articleId is URL
+    suspend fun getArticleById(articleId: String): Article? {
         Log.d("NewsRepository", "Getting article by ID '$articleId' from DAO (single)")
         return articleDao.getArticleById(articleId)
     }
 
-    // *** ADD THIS FUNCTION ***
-    fun getArticleFlowById(articleId: String): Flow<Article?> { // articleId is URL
+    fun getArticleFlowById(articleId: String): Flow<Article?> {
         Log.d("NewsRepository", "Getting article FLOW by ID '$articleId' from DAO")
-        return articleDao.getArticleFlowById(articleId) // Call the new DAO method
+        return articleDao.getArticleFlowById(articleId)
     }
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun refreshNewsForCategory(category: String, country: String = "us"): Result<Unit> {
-        return updateLocalNews(category) { // Use helper function
+        return updateLocalNews(category) {
             newsApiService.getTopHeadlines(country, category, apiKey)
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun searchNews(query: String, sortBy: String = "publishedAt"): Result<Unit> {
-        return updateLocalNews("search") { // Use helper function, assign "search" category
+        return updateLocalNews("search") {
             newsApiService.searchNews(query, sortBy, apiKey)
         }
     }
@@ -71,7 +68,7 @@ class NewsRepository(
     @RequiresApi(Build.VERSION_CODES.O)
     private suspend fun updateLocalNews(
         categoryForNewArticles: String,
-        fetchAction: suspend () -> com.example.newsexplorer.data.api.NewsResponse // Use correct NewsResponse import
+        fetchAction: suspend () -> com.example.newsexplorer.data.api.NewsResponse
     ): Result<Unit> {
         return withContext(Dispatchers.IO) {
             try {
@@ -83,14 +80,14 @@ class NewsRepository(
 
                     if (response.articles.isEmpty()) {
                         Log.d("NewsRepository", "No articles fetched, nothing to insert.")
-                        return@withContext Result.success(Unit) // Nothing to do
+                        return@withContext Result.success(Unit)
                     }
 
                     // Get existing articles from DB to check for bookmarks (using URL as ID)
                     // Fetch only the IDs (URLs) and bookmark status for efficiency
-                    val existingArticlesMap = articleDao.getAllArticles() // Fetch all needed to check bookmarks
-                        .firstOrNull() // Get the current list once
-                        ?.associate { it.id to it.isBookmarked } // Map URL to bookmark status
+                    val existingArticlesMap = articleDao.getAllArticles()
+                        .firstOrNull()
+                        ?.associate { it.id to it.isBookmarked }
                         ?: emptyMap()
 
                     val articlesToInsert = response.articles.mapNotNull { apiArticle ->
@@ -144,7 +141,6 @@ class NewsRepository(
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun ApiArticle.toArticle(category: String): Article? {
-        // Validate essential fields - URL is now critical as it's the ID
         if (url.isBlank() || title.isBlank()) {
             Log.w("NewsRepository", "Skipping article with blank URL or Title: '$title', '$url'")
             return null
@@ -152,7 +148,7 @@ class NewsRepository(
         val parsedDate: Date = parseApiDate(publishedAt, title)
 
         return Article(
-            id = url, // *** USE URL AS THE PRIMARY KEY ***
+            id = url,
             title = title,
             description = description ?: "",
             content = content ?: description ?: "",
@@ -161,15 +157,13 @@ class NewsRepository(
             publishedAt = parsedDate,
             author = author,
             sourceId = source.id ?: source.name,
-            sourceName = source.name, // name is non-nullable
+            sourceName = source.name,
             category = category,
-            // isBookmarked is handled by the merge logic in updateLocalNews now
-            isBookmarked = false // Default to false during initial mapping
+            isBookmarked = false
         )
     }
 
     private fun parseApiDate(dateString: String, articleTitle: String): Date {
-        // ... (parsing logic remains the same) ...
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && apiDateFormatter != null) {
             try {
                 return OffsetDateTime.parse(dateString, apiDateFormatter)

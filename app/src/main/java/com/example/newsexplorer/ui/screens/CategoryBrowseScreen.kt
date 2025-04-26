@@ -36,19 +36,16 @@ import com.example.newsexplorer.viewmodel.NewsViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryBrowseScreen(
-    viewModel: NewsViewModel, // CORRECT ViewModel parameter
+    viewModel: NewsViewModel,
     categoryId: String,
     onArticleClick: (Article) -> Unit,
     onBackClick: () -> Unit,
     onSearchClick: () -> Unit
 ) {
-    // Set category when entering/changing
     LaunchedEffect(categoryId) {
         viewModel.setSelectedCategory(categoryId)
-        // DO NOT collect state here
     }
 
-    // Collect state at the top level
     val articles by viewModel.articles.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -64,7 +61,7 @@ fun CategoryBrowseScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = categoryId.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }, // Capitalize category name
+                        text = categoryId.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() },
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -75,7 +72,7 @@ fun CategoryBrowseScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = onSearchClick) { // Add search icon button
+                    IconButton(onClick = onSearchClick) {
                         Icon(Icons.Filled.Search, contentDescription = "Search")
                     }
                 }

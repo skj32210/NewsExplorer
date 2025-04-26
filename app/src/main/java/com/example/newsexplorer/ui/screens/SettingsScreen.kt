@@ -1,6 +1,5 @@
 package com.example.newsexplorer.ui.screens
 
-// Import SettingsViewModel
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,7 +38,7 @@ import com.example.newsexplorer.viewmodel.SettingsViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel, // Correct ViewModel parameter
+    viewModel: SettingsViewModel,
     onBackClick: () -> Unit
 ) {
     val themeMode by viewModel.themeMode.collectAsState()
@@ -69,9 +68,9 @@ fun SettingsScreen(
             Text("Appearance", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.height(8.dp))
 
-            PreferenceTitle("Theme") // Call helper
+            PreferenceTitle("Theme")
             Column(Modifier.selectableGroup()) {
-                SettingsRadioButton( // Call helper
+                SettingsRadioButton(
                     text = "System Default",
                     selected = themeMode == 0,
                     onClick = { viewModel.setThemeMode(0) }
@@ -79,12 +78,12 @@ fun SettingsScreen(
                 SettingsRadioButton(
                     text = "Light",
                     selected = themeMode == 1,
-                    onClick = { viewModel.setThemeMode(1) } // Correct ViewModel action
+                    onClick = { viewModel.setThemeMode(1) }
                 )
                 SettingsRadioButton(
                     text = "Dark",
                     selected = themeMode == 2,
-                    onClick = { viewModel.setThemeMode(2) } // Correct ViewModel action
+                    onClick = { viewModel.setThemeMode(2) }
                 )
             }
 
@@ -98,17 +97,17 @@ fun SettingsScreen(
                 SettingsRadioButton(
                     text = "Small",
                     selected = fontSize == 0,
-                    onClick = { viewModel.setFontSize(0) } // Correct ViewModel action
+                    onClick = { viewModel.setFontSize(0) }
                 )
                 SettingsRadioButton(
                     text = "Medium",
                     selected = fontSize == 1,
-                    onClick = { viewModel.setFontSize(1) } // Correct ViewModel action
+                    onClick = { viewModel.setFontSize(1) }
                 )
                 SettingsRadioButton(
                     text = "Large",
                     selected = fontSize == 2,
-                    onClick = { viewModel.setFontSize(2) } // Correct ViewModel action
+                    onClick = { viewModel.setFontSize(2) }
                 )
             }
 
@@ -123,7 +122,7 @@ fun SettingsScreen(
             SettingsSwitch(
                 text = "Enable News Notifications",
                 checked = notificationsEnabled,
-                onCheckedChange = { viewModel.setNotificationsEnabled(it) } // Correct ViewModel action
+                onCheckedChange = { viewModel.setNotificationsEnabled(it) }
             )
 
 
@@ -131,11 +130,10 @@ fun SettingsScreen(
             HorizontalDivider()
             Spacer(modifier = Modifier.height(16.dp))
 
-            // --- Data Management ---
             Text("Data", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.height(8.dp))
 
-            PreferenceItem( // Call helper
+            PreferenceItem(
                 title = "Clear Cache",
                 summary = "Remove downloaded articles (excluding bookmarks)",
                 onClick = {
@@ -146,7 +144,6 @@ fun SettingsScreen(
     }
 }
 
-// Keep helper composables (PreferenceTitle, SettingsRadioButton, etc.) as they were
 
 @Composable
 fun PreferenceTitle(text: String) {

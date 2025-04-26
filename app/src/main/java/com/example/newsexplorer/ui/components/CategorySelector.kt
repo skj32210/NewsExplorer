@@ -87,15 +87,14 @@ fun CategoryItem(
 }
 
 private fun getCategoryIcon(categoryId: String): ImageVector {
-    return when (categoryId.lowercase()) { // Use lowercase for safety
+    return when (categoryId.lowercase()) {
         "general" -> Icons.Filled.Public
         "business" -> Icons.Filled.Business
-        "technology" -> Icons.Filled.Memory // Or Science if preferred
+        "technology" -> Icons.Filled.Memory
         "sports" -> Icons.Filled.SportsBasketball
         "entertainment" -> Icons.Filled.LocalMovies
         "science" -> Icons.Filled.Science
         "health" -> Icons.Filled.HealthAndSafety
-        // Add more mappings as needed
-        else -> Icons.Filled.Public // Default icon
+        else -> Icons.Filled.Public
     }
 }

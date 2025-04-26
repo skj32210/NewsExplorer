@@ -5,10 +5,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("kotlin-kapt") // Or id("com.google.devtools.ksp") if using KSP
+    id("kotlin-kapt")
 }
 
-// Read properties from local.properties
 val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
@@ -16,11 +15,11 @@ if (localPropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.example.newsexplorer" // Changed to example for consistency with code
+    namespace = "com.example.newsexplorer"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.newsexplorer" // Changed to example
+        applicationId = "com.example.newsexplorer"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -31,11 +30,9 @@ android {
             useSupportLibrary = true
         }
 
-        // Define NEWS_API_KEY in BuildConfig
         val newsApiKey = localProperties.getProperty("NEWS_API_KEY") ?: ""
         buildConfigField("String", "NEWS_API_KEY", "\"$newsApiKey\"")
 
-        // REMOVED Kapt arguments from here
     }
 
     buildTypes {
@@ -66,9 +63,8 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-} // End android block
+}
 
-// Add Kapt arguments block HERE (outside android block)
 kapt {
     arguments {
         arg("room.schemaLocation", "$projectDir/schemas")
@@ -77,7 +73,6 @@ kapt {
 }
 
 dependencies {
-    // Dependencies seem okay, ensure aliases in libs.versions.toml match
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
