@@ -9,7 +9,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 
-// Define color schemes
+
+// color schemes
 private val LightColors = lightColorScheme(
     primary = Color(0xFF0066CC),
     onPrimary = Color.White,
@@ -34,7 +35,6 @@ private val DarkColors = darkColorScheme(
 
 // Font sizes
 enum class FontSize { Small, Medium, Large }
-
 val LocalFontSize = compositionLocalOf { FontSize.Medium }
 
 @Composable
@@ -44,11 +44,12 @@ fun NewsExplorerTheme(
     content: @Composable () -> Unit
 ) {
     val colors = if (darkTheme) DarkColors else LightColors
+    val typography = appTypography(fontSize = fontSize)
 
     CompositionLocalProvider(LocalFontSize provides fontSize) {
         MaterialTheme(
             colorScheme = colors,
-            typography = Typography,
+            typography = typography,
             shapes = Shapes,
             content = content
         )

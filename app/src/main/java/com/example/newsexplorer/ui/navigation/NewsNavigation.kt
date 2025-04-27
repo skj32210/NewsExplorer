@@ -10,24 +10,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.newsexplorer.SettingsViewModelFactory
 import com.example.newsexplorer.data.preferences.UserPreferencesManager
 import com.example.newsexplorer.data.repository.NewsRepository
-import com.example.newsexplorer.ui.screens.ArticleDetailScreen
-import com.example.newsexplorer.ui.screens.CategoryBrowseScreen
-import com.example.newsexplorer.ui.screens.NewsHomeScreen
-import com.example.newsexplorer.ui.screens.SavedArticlesScreen
-import com.example.newsexplorer.ui.screens.SearchResultsScreen
-import com.example.newsexplorer.ui.screens.SettingsScreen
-import com.example.newsexplorer.viewmodel.ArticleDetailViewModel
-import com.example.newsexplorer.viewmodel.ArticleDetailViewModelFactory
-import com.example.newsexplorer.viewmodel.NewsViewModel
-import com.example.newsexplorer.viewmodel.NewsViewModelFactory
-import com.example.newsexplorer.viewmodel.SavedArticlesViewModel
-import com.example.newsexplorer.viewmodel.SavedArticlesViewModelFactory
-import com.example.newsexplorer.viewmodel.SearchViewModel
-import com.example.newsexplorer.viewmodel.SearchViewModelFactory
-import com.example.newsexplorer.viewmodel.SettingsViewModel
+import com.example.newsexplorer.ui.screens.*
+import com.example.newsexplorer.viewmodel.*
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -112,7 +98,9 @@ fun NewsNavigation(
         }
 
         composable(NavDestinations.SETTINGS) {
-            val settingsViewModel: SettingsViewModel = viewModel(factory = SettingsViewModelFactory(userPreferencesManager))
+            val settingsViewModel: SettingsViewModel = viewModel(
+                factory = SettingsViewModelFactory(userPreferencesManager, repository)
+            )
             SettingsScreen(
                 viewModel = settingsViewModel,
                 onBackClick = { navController.popBackStack() }

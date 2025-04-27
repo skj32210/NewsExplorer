@@ -4,15 +4,15 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.newsexplorer.data.preferences.UserPreferencesManager
+import com.example.newsexplorer.data.repository.NewsRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class SettingsViewModel
-constructor(
-    private val preferencesManager: UserPreferencesManager
-
+class SettingsViewModel(
+    private val preferencesManager: UserPreferencesManager,
+    private val repository: NewsRepository
 ) : ViewModel() {
 
 
@@ -63,7 +63,13 @@ constructor(
 
     fun clearCache() {
         viewModelScope.launch {
-            Log.d("SettingsViewModel", "Clear cache action triggered (implementation needed)")
+            try {
+                Log.d("SettingsViewModel", "Attempting to clear non-bookmarked articles...")
+                repository.clearNonBookmarkedArticles()
+                Log.d("SettingsViewModel", "Cache cleared successfully.")
+            } catch (e: Exception) {
+                Log.e("SettingsViewModel", "Error clearing cache", e)
+            }
         }
     }
 }

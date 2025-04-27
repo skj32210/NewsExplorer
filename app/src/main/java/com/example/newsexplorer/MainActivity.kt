@@ -12,17 +12,17 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.newsexplorer.data.preferences.UserPreferencesManager
 import com.example.newsexplorer.ui.navigation.NewsNavigation
 import com.example.newsexplorer.ui.theme.FontSize
 import com.example.newsexplorer.ui.theme.NewsExplorerTheme
 import com.example.newsexplorer.viewmodel.SettingsViewModel
+import com.example.newsexplorer.viewmodel.SettingsViewModelFactory
 
 class MainActivity : ComponentActivity() {
 
+    private val newsRepository by lazy { (applicationContext as NewsExplorerApplication).newsRepository }
+    private val userPreferencesManager by lazy { (applicationContext as NewsExplorerApplication).userPreferencesManager }
 
     @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -36,16 +36,16 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val settingsViewModel: SettingsViewModel = viewModel(
-                factory = SettingsViewModelFactory(userPreferencesManager)
+                factory = SettingsViewModelFactory(userPreferencesManager, newsRepository)
             )
 
             val themeMode by settingsViewModel.themeMode.collectAsState()
             val fontSizeSetting by settingsViewModel.fontSize.collectAsState()
 
             val useDarkTheme = when (themeMode) {
-                1 -> false // Light
-                2 -> true  // Dark
-                else -> isSystemInDarkTheme() // System default
+                1 -> false
+                2 -> true
+                else -> isSystemInDarkTheme()
             }
             val appFontSize = when (fontSizeSetting) {
                 0 -> FontSize.Small
@@ -64,15 +64,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-class SettingsViewModelFactory(private val prefsManager: UserPreferencesManager) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(SettingsViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return SettingsViewModel(prefsManager) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }
